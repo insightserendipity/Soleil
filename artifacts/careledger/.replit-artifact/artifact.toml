@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "CareLedger"
+description = "A calm, person-centered financial planning workspace for people with special needs and the parents, guardians, and partners who support them. It organizes benefits-aware planning, goals, documents, and next actions in one shared place."
+version = "1.0.0"
+id = "artifacts/careledger"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23034
+
+[services.development]
+run = "pnpm --filter @workspace/careledger run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/careledger", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/careledger/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23034"
+BASE_PATH = "/"

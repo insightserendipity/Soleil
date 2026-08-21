@@ -10,6 +10,14 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: dashboard
+    description: CareLedger overview
+  - name: people
+    description: People supported by the care team
+  - name: tasks
+    description: Planning actions
+  - name: documents
+    description: Important planning documents
 paths:
   /healthz:
     get:
@@ -24,7 +32,142 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get the current planning overview
+      responses:
+        "200":
+          description: Planning overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+  /people:
+    get:
+      operationId: listPeople
+      tags: [people]
+      summary: List supported people
+      responses:
+        "200":
+          description: People
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Person"
+    post:
+      operationId: createPerson
+      tags: [people]
+      summary: Add a person to the care plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonInput"
+      responses:
+        "201":
+          description: Person created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+  /people/{id}:
+    patch:
+      operationId: updatePerson
+      tags: [people]
+      summary: Update a person
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonUpdate"
+      responses:
+        "200":
+          description: Updated person
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+  /tasks:
+    get:
+      operationId: listTasks
+      tags: [tasks]
+      summary: List planning tasks
+      responses:
+        "200":
+          description: Tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+    post:
+      operationId: createTask
+      tags: [tasks]
+      summary: Create a planning task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        "201":
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+  /tasks/{id}:
+    patch:
+      operationId: updateTask
+      tags: [tasks]
+      summary: Update a planning task
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskUpdate"
+      responses:
+        "200":
+          description: Updated task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+  /documents:
+    get:
+      operationId: listDocuments
+      tags: [documents]
+      summary: List planning documents
+      responses:
+        "200":
+          description: Documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Document"
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: number
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +176,97 @@ components:
           type: string
       required:
         - status
+    Person:
+      type: object
+      required: [id, name, relationship, age, planStatus, initials, accent]
+      properties:
+        id: { type: number }
+        name: { type: string }
+        relationship: { type: string }
+        age: { type: number }
+        planStatus: { type: string, enum: [on-track, needs-attention, getting-started] }
+        initials: { type: string }
+        accent: { type: string }
+    PersonInput:
+      type: object
+      required: [name, relationship, age]
+      properties:
+        name: { type: string, minLength: 1 }
+        relationship: { type: string, minLength: 1 }
+        age: { type: number, minimum: 0 }
+    PersonUpdate:
+      type: object
+      properties:
+        name: { type: string, minLength: 1 }
+        relationship: { type: string, minLength: 1 }
+        age: { type: number, minimum: 0 }
+        planStatus: { type: string, enum: [on-track, needs-attention, getting-started] }
+    Task:
+      type: object
+      required: [id, title, category, dueLabel, status, priority]
+      properties:
+        id: { type: number }
+        title: { type: string }
+        category: { type: string }
+        dueLabel: { type: string }
+        status: { type: string, enum: [todo, in-progress, done] }
+        priority: { type: string, enum: [high, medium, low] }
+    TaskInput:
+      type: object
+      required: [title, category]
+      properties:
+        title: { type: string, minLength: 1 }
+        category: { type: string, minLength: 1 }
+        dueLabel: { type: string }
+        priority: { type: string, enum: [high, medium, low] }
+    TaskUpdate:
+      type: object
+      properties:
+        title: { type: string, minLength: 1 }
+        status: { type: string, enum: [todo, in-progress, done] }
+        priority: { type: string, enum: [high, medium, low] }
+        dueLabel: { type: string }
+    Document:
+      type: object
+      required: [id, name, type, updatedLabel, status]
+      properties:
+        id: { type: number }
+        name: { type: string }
+        type: { type: string }
+        updatedLabel: { type: string }
+        status: { type: string, enum: [ready, review, missing] }
+    Dashboard:
+      type: object
+      required: [person, progress, completedTasks, totalTasks, benefits, netWorth, monthlySupport, recentActivity]
+      properties:
+        person:
+          $ref: "#/components/schemas/Person"
+        progress: { type: number, minimum: 0, maximum: 100 }
+        completedTasks: { type: number }
+        totalTasks: { type: number }
+        benefits:
+          type: array
+          items:
+            $ref: "#/components/schemas/Benefit"
+        netWorth: { type: number }
+        monthlySupport: { type: number }
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/Activity"
+    Benefit:
+      type: object
+      required: [name, status, note]
+      properties:
+        name: { type: string }
+        status: { type: string, enum: [protected, review, incomplete] }
+        note: { type: string }
+    Activity:
+      type: object
+      required: [id, label, timeLabel, tone]
+      properties:
+        id: { type: number }
+        label: { type: string }
+        timeLabel: { type: string }
+        tone: { type: string, enum: [green, blue, amber] }
 

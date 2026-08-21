@@ -1,6 +1,6 @@
-# [Project name]
+# CareLedger
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+CareLedger is a person-centered financial planning workspace for special-needs families and their care circles.
 
 ## Run & Operate
 
@@ -22,23 +22,27 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/careledger` — the runnable React web app and its theme.
+- `artifacts/api-server/src/routes/careledger.ts` — dashboard, people, tasks, and documents API.
+- `lib/api-spec/openapi.yaml` — source-of-truth API contract; regenerate clients after changes.
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The first release prioritizes clarity and shared planning over investment automation.
+- Benefits-aware planning is framed as organization and reminders, not legal, tax, or fiduciary advice.
+- The API currently uses small in-process seed collections so the product can be explored immediately; persistent storage can be added as the next milestone.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+The app gives a caregiver an overview of one active care plan, benefits status, net-worth and monthly-support snapshots, next actions, activity history, supported people, task completion, important documents, and team/safety preferences.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+No additional preferences recorded.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Use `type: number` rather than OpenAPI `type: integer` in this workspace's spec because the generated Zod package is v3 and does not expose `z.int()`.
 
 ## Pointers
 

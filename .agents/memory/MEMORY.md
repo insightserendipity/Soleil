@@ -1,0 +1,1 @@
+- [OpenAPI/Zod compatibility](openapi-zod-version.md) — generated Zod is v3; integer schemas currently need numeric compatibility.
